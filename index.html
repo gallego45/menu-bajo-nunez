@@ -32,13 +32,18 @@
 
                 // Procesar cada fila del Excel
                 filas.forEach(linea => {
-                    // El orden debe ser: Categoría, Marca, Nombre, Variedad, Formato, Precio
-                    const columnas = linea.split(',');
-                    if (columnas.length < 6) return;
-
-                    const [cat, marca, nombre, variedad, formato, precio] = columnas;
+                    // Agregamos 'stock' al final de la desestructuración
+                    const [cat, marca, nombre, variedad, formato, precio, stock] = linea.split(',');
+                    
+                    // VALIDACIÓN CRÍTICA:
+                    // Si la columna stock dice "NO", saltamos esta fila y no la dibujamos
+                    if (stock && stock.trim().toUpperCase() === 'NO') {
+                        return; 
+                    }
+                
+                    if (!cat) return;
                     const categoriaTrim = cat.trim();
-
+                
                     if (!categorias[categoriaTrim]) {
                         categorias[categoriaTrim] = [];
                     }
@@ -78,4 +83,5 @@
     </script>
 </body>
 </html>
+
 
