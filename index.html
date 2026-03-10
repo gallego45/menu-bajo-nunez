@@ -71,25 +71,37 @@
                     const subGruposOrdenados = Object.keys(subGrupos).sort();
 
                     subGruposOrdenados.forEach(nombreSub => {
-                        htmlFinal += `
-                        <div class="mb-8">
-                            <h3 class="text-xl font-bold text-nunez border-b-2 border-nunez mb-4 uppercase italic ml-2">${nombreSub}</h3>
-                            <div class="space-y-4">`;
+    htmlFinal += `
+    <div class="mb-8">
+        <h3 class="text-xl font-bold text-nunez border-b-2 border-nunez mb-4 uppercase italic ml-2">
+            ${nombreSub}
+        </h3>
+        <div class="space-y-4">`;
 
-                        subGrupos[nombreSub].forEach(item => {
-                            htmlFinal += `
-                            <div class="flex items-center justify-between border-b border-gray-200 py-3 px-2 hover:bg-orange-50 transition-colors">
-                                <div class="w-1/3 leading-tight">
-                                    <span class="font-bold block">${item.marca}</span>
-                                    <span class="text-[10px] uppercase tracking-widest text-gray-500 font-normal">${item.nombre}</span>
-                                </div>
-                                <div class="w-1/4 text-gray-600 text-xs italic">${item.variedad}</div>
-                                <div class="w-1/6 text-center font-bold text-gray-400 text-xs">${item.formato}</div>
-                                <div class="w-1/4 text-right font-black text-xl text-black">$${item.precio}</div>
-                            </div>`;
-                        });
-                        htmlFinal += `</div></div>`;
-                    });
+        subGrupos[nombreSub].forEach(item => {
+            // Lógica: Si el subgrupo ya es la Marca (Nacionales), no la repetimos en la fila.
+            // Solo mostramos el Nombre de la cerveza (ej: CAPITAN NELSON).
+            const tituloFila = (nombreSec.toLowerCase().includes('nacional')) 
+                               ? item.nombre 
+                               : item.marca;
+    
+            const subtituloFila = (nombreSec.toLowerCase().includes('nacional'))
+                                  ? "" // Opcional: podrías poner la variedad aquí si querés
+                                  : item.nombre;
+    
+            htmlFinal += `
+            <div class="flex items-center justify-between border-b border-gray-200 py-3 px-2 hover:bg-orange-50 transition-colors">
+                <div class="w-1/3 leading-tight">
+                    <span class="font-bold block uppercase">${tituloFila}</span>
+                    <span class="text-[10px] uppercase tracking-widest text-gray-500 font-normal">${subtituloFila}</span>
+                </div>
+                <div class="w-1/4 text-gray-600 text-xs italic">${item.variedad}</div>
+                <div class="w-1/6 text-center font-bold text-gray-400 text-xs">${item.formato}</div>
+                <div class="w-1/4 text-right font-black text-xl text-black">$${item.precio}</div>
+            </div>`;
+        });
+        htmlFinal += `</div></div>`;
+});
                     htmlFinal += `</section>`;
                 }
                 container.innerHTML = htmlFinal || "<p class='text-center'>No hay productos disponibles con stock actualmente.</p>";
@@ -104,5 +116,6 @@
     </script>
 </body>
 </html>
+
 
 
