@@ -1,81 +1,108 @@
+¡Excelente! Ya con la URL del CSV integrada, el sistema queda totalmente automatizado. Como desarrollador, sabés que ahora tu index.html es simplemente un frontend reactivo a lo que pase en esa hoja de cálculo.
+
+Aquí tenés el código final actualizado con tu URL específica, el logo de Bajo Núñez y la paleta de colores corporativa.
+
+index.html (Versión Final Automatizada)
+HTML
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu Cervezas Bajo Núñez</title>
+    <title>Menú Cervezas - Bajo Núñez</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { --naranja-nunez: #ef8b33; }
+        .bg-nunez { background-color: var(--naranja-nunez); }
+        .text-nunez { color: var(--naranja-nunez); }
+        .border-nunez { border-color: var(--naranja-nunez); }
+        body { background-color: #fcfaf7; }
+    </style>
 </head>
-<body class="bg-white p-4 sm:p-8 font-sans text-gray-900">
+<body class="p-4 sm:p-8 font-sans text-gray-900">
 
-    <header class="mb-8 border-b-4 border-black pb-4">
-        <h1 class="text-4xl font-black uppercase italic">Cervezas Bajo Núñez</h1>
+    <header class="flex flex-col items-center mb-10 border-b-4 border-black pb-6">
+        <img src="bajoNunezLogo.jpg" alt="Bajo Núñez" class="w-48 h-48 object-contain mb-2">
+        <h1 class="text-2xl font-black uppercase italic tracking-tighter text-center">Catálogo de Cervezas</h1>
     </header>
 
-    <div id="menu-container">
-        <p class="text-center py-10">Cargando menú...</p>
+    <div id="menu-container" class="max-w-3xl mx-auto">
+        <p class="text-center italic animate-pulse">Consultando la heladera...</p>
     </div>
 
     <script>
-       const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQdFHMhJq5XKLDcjR5gHqVYS7_LYOK6qcLnxeiSqQluawfBcvMVxtCfOI2uRZtQfPj6fBOZPMxTKy8r/pub?gid=0&single=true&output=csv';
+        // URL pública de tu CSV ya integrada
+        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQdFHMhJq5XKLDcjR5gHqVYS7_LYOK6qcLnxeiSqQluawfBcvMVxtCfOI2uRZtQfPj6fBOZPMxTKy8r/pub?gid=0&single=true&output=csv';
 
         async function cargarMenu() {
             try {
                 const respuesta = await fetch(SHEET_CSV_URL);
                 const textoCsv = await respuesta.text();
-
-                // Dividir por filas y saltar la cabecera
-                const filas = textoCsv.split('\n').slice(1);
+                
+                // Limpieza de filas (quitamos cabecera y filas vacías)
+                const filas = textoCsv.split('\n').slice(1).filter(f => f.trim() !== '');
                 const container = document.getElementById('menu-container');
-
+                
                 const categorias = {};
 
-                // Procesar cada fila del Excel
                 filas.forEach(linea => {
-                    // Agregamos 'stock' al final de la desestructuración
-                    const [cat, marca, nombre, variedad, formato, precio, stock] = linea.split(',');
+                    // Estructura esperada: Categoría, Marca, Nombre, Variedad, Formato, Precio, Stock
+                    const columnas = linea.split(',').map(c => c.trim());
+                    if (columnas.length < 6) return;
+
+                    const [seccion, marca, nombre, variedad, formato, precio, stock] = columnas;
                     
-                    // VALIDACIÓN CRÍTICA:
-                    // Si la columna stock dice "NO", saltamos esta fila y no la dibujamos
-                    if (stock && stock.trim().toUpperCase() === 'NO') {
-                        return; 
-                    }
-                
-                    if (!cat) return;
-                    const categoriaTrim = cat.trim();
-                
-                    if (!categorias[categoriaTrim]) {
-                        categorias[categoriaTrim] = [];
-                    }
-                    categorias[categoriaTrim].push({ marca, nombre, variedad, formato, precio });
+                    // Lógica de Stock
+                    if (stock && stock.toUpperCase() === 'NO') return;
+                    if (!seccion) return;
+
+                    if (!categorias[seccion]) categorias[seccion] = {};
+
+                    // Nacionales agrupa por MARCA | Internacionales agrupa por PAÍS (Variedad)
+                    const esInternacional = seccion.toLowerCase().includes('internacional');
+                    const subGrupo = esInternacional ? variedad : marca;
+
+                    if (!categorias[seccion][subGrupo]) categorias[seccion][subGrupo] = [];
+                    categorias[seccion][subGrupo].push({ marca, nombre, variedad, formato, precio });
                 });
 
-                // Generar el HTML
                 let htmlFinal = '';
-                for (const [nombreCat, items] of Object.entries(categorias)) {
+
+                // Renderizado por Secciones (Nacionales, Internacionales, etc.)
+                for (const [nombreSec, subGrupos] of Object.entries(categorias)) {
                     htmlFinal += `
-                    <section class="mb-10">
-                        <h2 class="text-2xl font-bold bg-gray-100 p-2 mb-4 border-l-4 border-black uppercase">${nombreCat}</h2>
-                        <div class="space-y-2">`;
+                    <section class="mb-12">
+                        <h2 class="text-3xl font-black bg-black text-white p-3 mb-6 uppercase italic border-b-8 border-nunez">${nombreSec}</h2>`;
+                    
+                    const subGruposOrdenados = Object.keys(subGrupos).sort();
 
-                    items.forEach(item => {
+                    subGruposOrdenados.forEach(nombreSub => {
                         htmlFinal += `
-                        <div class="flex items-center justify-between border-b border-gray-200 py-2 text-sm sm:text-base">
-                            <div class="w-1/3 font-bold">${item.marca} <span class="font-normal text-gray-600 block sm:inline italic text-xs">${item.nombre}</span></div>
-                            <div class="w-1/4 text-gray-600">${item.variedad}</div>
-                            <div class="w-1/6 text-center">${item.formato}</div>
-                            <div class="w-1/4 text-right font-black">${item.precio}</div>
-                        </div>`;
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold text-nunez border-b-2 border-nunez mb-4 uppercase italic ml-2">${nombreSub}</h3>
+                            <div class="space-y-4">`;
+
+                        subGrupos[nombreSub].forEach(item => {
+                            htmlFinal += `
+                            <div class="flex items-center justify-between border-b border-gray-200 py-3 px-2 hover:bg-orange-50 transition-colors">
+                                <div class="w-1/3 leading-tight">
+                                    <span class="font-bold block">${item.marca}</span>
+                                    <span class="text-[10px] uppercase tracking-widest text-gray-500 font-normal">${item.nombre}</span>
+                                </div>
+                                <div class="w-1/4 text-gray-600 text-xs italic">${item.variedad}</div>
+                                <div class="w-1/6 text-center font-bold text-gray-400 text-xs">${item.formato}</div>
+                                <div class="w-1/4 text-right font-black text-xl text-black">$${item.precio}</div>
+                            </div>`;
+                        });
+                        htmlFinal += `</div></div>`;
                     });
-
-                    htmlFinal += `</div></section>`;
+                    htmlFinal += `</section>`;
                 }
-
-                container.innerHTML = htmlFinal;
+                container.innerHTML = htmlFinal || "<p class='text-center'>No hay productos disponibles con stock actualmente.</p>";
 
             } catch (error) {
-                console.error("Error cargando el menú:", error);
-                document.getElementById('menu-container').innerHTML = "<p>Error al cargar los datos del Excel.</p>";
+                console.error(error);
+                document.getElementById('menu-container').innerHTML = "<p class='text-center text-red-500'>Error de conexión. Refrescá la página.</p>";
             }
         }
 
@@ -83,5 +110,3 @@
     </script>
 </body>
 </html>
-
-
