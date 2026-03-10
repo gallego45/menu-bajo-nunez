@@ -84,8 +84,7 @@
         
             // Lógica para Nacionales: Marca en el título, Nombre en la fila.
             // Lógica para Internacionales: País en el título, Marca en la fila.
-            const lineaPrincipal = esNacional ? item.nombre : item.marca;
-            const lineaSecundaria = esNacional ? "" : item.nombre;
+            const lineaPrincipal = item.nombre;
             
             // ELIMINAR REDUNDANCIA: 
             // Si es internacional, el país (variedad) ya está en el título naranja, así que lo ocultamos en la fila.
@@ -95,7 +94,6 @@
             <div class="flex items-center justify-between border-b border-gray-200 py-3 px-2 hover:bg-orange-50 transition-colors">
                 <div class="w-1/2 leading-tight">
                     <span class="font-bold block uppercase text-sm sm:text-base">${lineaPrincipal}</span>
-                    <span class="text-[10px] uppercase tracking-widest text-gray-500 font-normal">${lineaSecundaria}</span>
                 </div>
                 <div class="w-1/4 text-gray-600 text-[10px] sm:text-xs italic">${textoVariedad}</div>
                 <div class="w-1/12 text-center font-bold text-gray-400 text-[10px] uppercase">${item.formato}</div>
@@ -118,6 +116,7 @@
     </script>
 </body>
 </html>
+
 
 
 
