@@ -79,25 +79,27 @@
         <div class="space-y-4">`;
 
         subGrupos[nombreSub].forEach(item => {
-            // Lógica: Si el subgrupo ya es la Marca (Nacionales), no la repetimos en la fila.
-            // Solo mostramos el Nombre de la cerveza (ej: CAPITAN NELSON).
-            const tituloFila = (nombreSec.toLowerCase().includes('nacional')) 
-                               ? item.nombre 
-                               : item.marca;
-    
-            const subtituloFila = (nombreSec.toLowerCase().includes('nacional'))
-                                  ? "" // Opcional: podrías poner la variedad aquí si querés
-                                  : item.nombre;
-    
+            const esNacional = nombreSec.toLowerCase().includes('nacional');
+            const esInternacional = nombreSec.toLowerCase().includes('internacional');
+        
+            // Lógica para Nacionales: Marca en el título, Nombre en la fila.
+            // Lógica para Internacionales: País en el título, Marca en la fila.
+            const lineaPrincipal = esNacional ? item.nombre : item.marca;
+            const lineaSecundaria = esNacional ? "" : item.nombre;
+            
+            // ELIMINAR REDUNDANCIA: 
+            // Si es internacional, el país (variedad) ya está en el título naranja, así que lo ocultamos en la fila.
+            const textoVariedad = esInternacional ? "" : item.variedad;
+        
             htmlFinal += `
             <div class="flex items-center justify-between border-b border-gray-200 py-3 px-2 hover:bg-orange-50 transition-colors">
-                <div class="w-1/3 leading-tight">
-                    <span class="font-bold block uppercase">${tituloFila}</span>
-                    <span class="text-[10px] uppercase tracking-widest text-gray-500 font-normal">${subtituloFila}</span>
+                <div class="w-1/2 leading-tight">
+                    <span class="font-bold block uppercase text-sm sm:text-base">${lineaPrincipal}</span>
+                    <span class="text-[10px] uppercase tracking-widest text-gray-500 font-normal">${lineaSecundaria}</span>
                 </div>
-                <div class="w-1/4 text-gray-600 text-xs italic">${item.variedad}</div>
-                <div class="w-1/6 text-center font-bold text-gray-400 text-xs">${item.formato}</div>
-                <div class="w-1/4 text-right font-black text-xl text-black">$${item.precio}</div>
+                <div class="w-1/4 text-gray-600 text-[10px] sm:text-xs italic">${textoVariedad}</div>
+                <div class="w-1/12 text-center font-bold text-gray-400 text-[10px] uppercase">${item.formato}</div>
+                <div class="w-1/4 text-right font-black text-lg sm:text-xl text-black">$${item.precio}</div>
             </div>`;
         });
         htmlFinal += `</div></div>`;
@@ -116,6 +118,7 @@
     </script>
 </body>
 </html>
+
 
 
 
