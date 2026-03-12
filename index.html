@@ -6,24 +6,36 @@
     <title>Menú Cervezas - Bajo Núñez</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --naranja-nunez: #ef8b33; }
+        :root { 
+            --naranja-nunez: #ef8b33; 
+            --fondo-crema: #fdfaf5; /* Un crema muy suave y limpio */
+        }
+        
         .bg-nunez { background-color: var(--naranja-nunez); }
         .text-nunez { color: var(--naranja-nunez); }
         .border-nunez { border-color: var(--naranja-nunez); }
         
         body { 
-            background-color: #f4f1ea; 
-            background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
-            background-attachment: fixed; /* Para que la textura no se mueva al scrollear */
+            background-color: var(--fondo-crema);
+            /* Quitamos la imagen externa para evitar que se vea "roto" */
+            background-image: radial-gradient(#e5e7eb 0.5px, transparent 0.5px);
+            background-size: 20px 20px; /* Un patrón de puntos industriales muy sutil */
         }
     
-        /* Estilo para que cada sección parezca una tarjeta sobre el papel */
+        /* Tarjetas de categorías más sólidas y limpias */
         section {
-            background-color: rgba(255, 255, 255, 0.4); /* Blanco semi-transparente */
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            backdrop-filter: blur(2px); /* Un toque sutil de desenfoque */
+            background-color: white;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); /* Sombra suave */
+            border: 1px solid #e5e7eb;
+        }
+    
+        /* Estilo para los títulos de marca */
+        h3 {
+            letter-spacing: -0.025em;
+            position: relative;
         }
     </style>
 </head>
