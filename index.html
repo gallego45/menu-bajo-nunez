@@ -87,7 +87,23 @@
                             </h3>
                             <div class="space-y-4">`;
 
-                        subGrupos[nombreSub].forEach(item => {
+                        subGruposOrdenados.forEach(nombreSub => {
+                        // 1. OBTENEMOS EL ARRAY DE PRODUCTOS DE ESTA MARCA
+                        const productos = subGrupos[nombreSub];
+                    
+                        // 2. ORDENAMOS POR PRECIO (de menor a mayor)
+                        // Usamos parseFloat para asegurar que la comparación sea numérica
+                        productos.sort((a, b) => parseFloat(a.precio) - parseFloat(b.precio));
+                    
+                        htmlFinal += `
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold text-nunez border-b-2 border-nunez mb-4 uppercase italic ml-2">
+                                ${nombreSub}
+                            </h3>
+                            <div class="space-y-4">`;
+                    
+                        // 3. RECORREMOS LOS PRODUCTOS YA ORDENADOS
+                        productos.forEach(item => {
                             const esInternacional = nombreSec.toLowerCase().includes('internacional');
                             const lineaPrincipal = item.nombre;
                             const textoVariedad = esInternacional ? "" : item.variedad;
@@ -118,4 +134,5 @@
     </script>
 </body>
 </html>
+
 
