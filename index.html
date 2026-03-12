@@ -72,28 +72,6 @@
 
                     marcasOrdenadas.forEach(nombreMarca => {
                         const productos = subGrupos[nombreMarca];
-                    
-                        // Normalizamos el nombre para el archivo (ej: "Strange Brewing" -> "strange")
-                        // Esto quita espacios y lo pasa a minúsculas
-                        const nombreArchivo = nombreMarca.toLowerCase().replace(/\s+/g, '');
-                        
-                        // Intentamos determinar la extensión (podés estandarizar todo a .png o usar un condicional)
-                        // Para este ejemplo, asumimos que tenés un mix de jpg y png
-                        const rutaLogo = `${nombreArchivo}.jpg`; 
-                    
-                        htmlFinal += `
-                        <div class="mb-8">
-                            <div class="flex items-center border-b-2 border-nunez mb-4 ml-2 pb-1">
-                                <img src="${rutaLogo}" 
-                                     onerror="this.style.display='none'" 
-                                     class="h-8 w-8 object-contain mr-3 rounded-full bg-white border border-gray-200"
-                                     alt="">
-                                
-                                <h3 class="text-xl font-bold text-nunez uppercase italic">
-                                    ${nombreMarca}
-                                </h3>
-                            </div>
-                            <div class="space-y-4">`;
 
                         // ORDENAMIENTO POR PRECIO (Menor a Mayor)
                         productos.sort((a, b) => {
@@ -138,4 +116,3 @@
     </script>
 </body>
 </html>
-
