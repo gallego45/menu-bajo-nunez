@@ -57,8 +57,8 @@
 
                         if (!categorias[seccion]) categorias[seccion] = {};
 
-                        // Agrupamos: Nacionales por MARCA | Importadas por PAÍS (Variedad)
-                        const subGrupo = (tipo === 'importado') ? variedad : marca;
+                        // Agrupamos: Nacionales por MARCA / PAÍS
+                        const subGrupo = marca;
 
                         if (!categorias[seccion][subGrupo]) categorias[seccion][subGrupo] = [];
                         categorias[seccion][subGrupo].push({ marca, nombre, variedad, formato, precio });
@@ -118,3 +118,4 @@
     </script>
 </body>
 </html>
+
