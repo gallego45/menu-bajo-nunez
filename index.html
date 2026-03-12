@@ -10,7 +10,21 @@
         .bg-nunez { background-color: var(--naranja-nunez); }
         .text-nunez { color: var(--naranja-nunez); }
         .border-nunez { border-color: var(--naranja-nunez); }
-        body { background-color: #f4f1ea; background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png"); }
+        
+        body { 
+            background-color: #f4f1ea; 
+            background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+            background-attachment: fixed; /* Para que la textura no se mueva al scrollear */
+        }
+    
+        /* Estilo para que cada sección parezca una tarjeta sobre el papel */
+        section {
+            background-color: rgba(255, 255, 255, 0.4); /* Blanco semi-transparente */
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(2px); /* Un toque sutil de desenfoque */
+        }
     </style>
 </head>
 <body class="p-4 sm:p-8 font-sans text-gray-900">
@@ -116,3 +130,4 @@
     </script>
 </body>
 </html>
+
