@@ -25,44 +25,53 @@
     </div>
 
     <script>
-        // URL pública de tu CSV ya integrada
-        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQdFHMhJq5XKLDcjR5gHqVYS7_LYOK6qcLnxeiSqQluawfBcvMVxtCfOI2uRZtQfPj6fBOZPMxTKy8r/pub?gid=0&single=true&output=csv';
+        // 1. Reemplazá estos links por los links CSV de cada hoja (fíjate que tengan gid distintos)
+        const URL_NACIONALES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQdFHMhJq5XKLDcjR5gHqVYS7_LYOK6qcLnxeiSqQluawfBcvMVxtCfOI2uRZtQfPj6fBOZPMxTKy8r/pub?gid=0&single=true&output=csv';
+        const URL_IMPORTADOS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQdFHMhJq5XKLDcjR5gHqVYS7_LYOK6qcLnxeiSqQluawfBcvMVxtCfOI2uRZtQfPj6fBOZPMxTKy8r/pub?gid=488168618&single=true&output=csv'; 
 
         async function cargarMenu() {
             try {
-                const respuesta = await fetch(SHEET_CSV_URL);
-                const textoCsv = await respuesta.text();
-                
-                // Limpieza de filas (quitamos cabecera y filas vacías)
-                const filas = textoCsv.split('\n').slice(1).filter(f => f.trim() !== '');
+                // Ejecutamos ambas peticiones en paralelo
+                const [resNac, resInt] = await Promise.all([
+                    fetch(URL_NACIONALES),
+                    fetch(URL_IMPORTADOS)
+                ]);
+
+                const textoNac = await resNac.text();
+                const textoInt = await resInt.text();
+
                 const container = document.getElementById('menu-container');
-                
                 const categorias = {};
 
-                filas.forEach(linea => {
-                    // Estructura esperada: Categoría, Marca, Nombre, Variedad, Formato, Precio, Stock
-                    const columnas = linea.split(',').map(c => c.trim());
-                    if (columnas.length < 6) return;
-
-                    const [seccion, marca, nombre, variedad, formato, precio, stock] = columnas;
+                // Función para procesar filas y evitar repetir código
+                const procesarBloque = (texto, tipo) => {
+                    const filas = texto.split('\n').slice(1).filter(f => f.trim() !== '');
                     
-                    // Lógica de Stock
-                    if (stock && stock.toUpperCase() === 'NO') return;
-                    if (!seccion) return;
+                    filas.forEach(linea => {
+                        const columnas = linea.split(',').map(c => c.trim());
+                        if (columnas.length < 6) return;
 
-                    if (!categorias[seccion]) categorias[seccion] = {};
+                        const [seccion, marca, nombre, variedad, formato, precio, stock] = columnas;
+                        if (stock && stock.toUpperCase() === 'NO') return;
+                        if (!seccion) return;
 
-                    // Nacionales agrupa por MARCA | Internacionales agrupa por PAÍS (Variedad)
-                    const esInternacional = seccion.toLowerCase().includes('internacional');
-                    const subGrupo = esInternacional ? variedad : marca;
+                        if (!categorias[seccion]) categorias[seccion] = {};
 
-                    if (!categorias[seccion][subGrupo]) categorias[seccion][subGrupo] = [];
-                    categorias[seccion][subGrupo].push({ marca, nombre, variedad, formato, precio });
-                });
+                        // Agrupamos: Nacionales por MARCA | Importadas por PAÍS (Variedad)
+                        const subGrupo = (tipo === 'importado') ? variedad : marca;
+
+                        if (!categorias[seccion][subGrupo]) categorias[seccion][subGrupo] = [];
+                        categorias[seccion][subGrupo].push({ marca, nombre, variedad, formato, precio });
+                    });
+                };
+
+                // Procesamos ambos textos
+                procesarBloque(textoNac, 'nacional');
+                procesarBloque(textoInt, 'importado');
 
                 let htmlFinal = '';
 
-                // Renderizado por Secciones (Nacionales, Internacionales, etc.)
+                // El resto de tu lógica de renderizado se mantiene intacta
                 for (const [nombreSec, subGrupos] of Object.entries(categorias)) {
                     htmlFinal += `
                     <section class="mb-12">
@@ -71,44 +80,37 @@
                     const subGruposOrdenados = Object.keys(subGrupos).sort();
 
                     subGruposOrdenados.forEach(nombreSub => {
-    htmlFinal += `
-    <div class="mb-8">
-        <h3 class="text-xl font-bold text-nunez border-b-2 border-nunez mb-4 uppercase italic ml-2">
-            ${nombreSub}
-        </h3>
-        <div class="space-y-4">`;
+                        htmlFinal += `
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold text-nunez border-b-2 border-nunez mb-4 uppercase italic ml-2">
+                                ${nombreSub}
+                            </h3>
+                            <div class="space-y-4">`;
 
-        subGrupos[nombreSub].forEach(item => {
-            const esNacional = nombreSec.toLowerCase().includes('nacional');
-            const esInternacional = nombreSec.toLowerCase().includes('internacional');
-        
-            // Lógica para Nacionales: Marca en el título, Nombre en la fila.
-            // Lógica para Internacionales: País en el título, Marca en la fila.
-            const lineaPrincipal = item.nombre;
-            
-            // ELIMINAR REDUNDANCIA: 
-            // Si es internacional, el país (variedad) ya está en el título naranja, así que lo ocultamos en la fila.
-            const textoVariedad = esInternacional ? "" : item.variedad;
-        
-            htmlFinal += `
-            <div class="flex items-center justify-between border-b border-gray-200 py-3 px-2 hover:bg-orange-50 transition-colors">
-                <div class="w-1/2 leading-tight">
-                    <span class="font-bold block uppercase text-sm sm:text-base">${lineaPrincipal}</span>
-                </div>
-                <div class="w-1/4 text-gray-600 text-[10px] sm:text-xs italic">${textoVariedad}</div>
-                <div class="w-1/12 text-center font-bold text-gray-400 text-[10px] uppercase">${item.formato}</div>
-                <div class="w-1/4 text-right font-black text-lg sm:text-xl text-black">$${item.precio}</div>
-            </div>`;
-        });
-        htmlFinal += `</div></div>`;
-});
+                        subGrupos[nombreSub].forEach(item => {
+                            const esInternacional = nombreSec.toLowerCase().includes('internacional');
+                            const lineaPrincipal = item.nombre;
+                            const textoVariedad = esInternacional ? "" : item.variedad;
+                        
+                            htmlFinal += `
+                            <div class="flex items-center justify-between border-b border-gray-200 py-3 px-2 hover:bg-orange-50 transition-colors">
+                                <div class="w-1/2 leading-tight">
+                                    <span class="font-bold block uppercase text-sm sm:text-base">${lineaPrincipal}</span>
+                                </div>
+                                <div class="w-1/4 text-gray-600 text-[10px] sm:text-xs italic">${textoVariedad}</div>
+                                <div class="w-1/12 text-center font-bold text-gray-400 text-[10px] uppercase">${item.formato}</div>
+                                <div class="w-1/4 text-right font-black text-lg sm:text-xl text-black">$${item.precio}</div>
+                            </div>`;
+                        });
+                        htmlFinal += `</div></div>`;
+                    });
                     htmlFinal += `</section>`;
                 }
-                container.innerHTML = htmlFinal || "<p class='text-center'>No hay productos disponibles con stock actualmente.</p>";
+                container.innerHTML = htmlFinal || "<p class='text-center'>No hay productos disponibles.</p>";
 
             } catch (error) {
                 console.error(error);
-                document.getElementById('menu-container').innerHTML = "<p class='text-center text-red-500'>Error de conexión. Refrescá la página.</p>";
+                document.getElementById('menu-container').innerHTML = "<p class='text-center text-red-500'>Error de conexión.</p>";
             }
         }
 
@@ -116,8 +118,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
